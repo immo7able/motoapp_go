@@ -1,0 +1,4 @@
+server_address: "localhost:8080"
+db_url: "host=localhost user=postgres password=postgres dbname=motoapp port=5433 sslmode=disable"
+jwt:
+  secret: "secret_key"
