@@ -2,43 +2,49 @@ package utils
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"motorcycleApp/domain/dto"
-	"net/http"
 )
 
 func ParseValidationErrors(err error) dto.Error {
-	var fieldErrors []dto.FieldError
-	var validationErrors validator.ValidationErrors
-	if errors.As(err, &validationErrors) {
-		for _, ve := range validationErrors {
-			fieldErrors = append(fieldErrors, dto.FieldError{
-				Field:   ve.Field(),
-				Message: validationMessage(ve),
-			})
+	var validationErrs validator.ValidationErrors
+	if !errors.As(err, &validationErrs) {
+		return dto.Error{
+			Code:    http.StatusBadRequest,
+			Message: "Ошибка валидации",
 		}
+	}
+
+	fieldErrors := make([]dto.FieldError, 0, len(validationErrs))
+	for _, fe := range validationErrs {
+		fieldErrors = append(fieldErrors, dto.FieldError{
+			Field:   fe.Field(),
+			Message: translateValidationMessage(fe),
+		})
 	}
 
 	return dto.Error{
 		Code:        http.StatusBadRequest,
-		Message:     "Validation Error",
+		Message:     "Ошибка валидации",
 		FieldErrors: fieldErrors,
 	}
 }
 
-func validationMessage(fe validator.FieldError) string {
+func translateValidationMessage(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
 		return "Поле обязательно для заполнения"
 	case "email":
 		return "Неверный формат email"
 	case "gte":
-		return "Минимальная длина " + fe.Param()
+		return "Минимальная длина — " + fe.Param()
 	case "len":
-		return "Должно быть длиной " + fe.Param()
+		return "Должно содержать " + fe.Param() + " символов"
 	case "numeric":
 		return "Должно быть числом"
 	default:
-		return "Неверное значение"
+		return "Недопустимое значение"
 	}
 }

@@ -1,38 +1,17 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+	"log"
 	"motorcycleApp/config"
-	"motorcycleApp/handler"
-	"motorcycleApp/routes"
-	"motorcycleApp/service"
+	"motorcycleApp/server"
 )
 
 func main() {
-	router := gin.Default()
-	router.LoadHTMLGlob("templates/*.html")
+
+	app := server.SetupApp()
 
 	cfg := config.NewConfig()
-	config.ConnectDatabase(cfg.DatabaseUrl)
-
-	db := config.DB
-
-	authService := &service.AuthService{
-		DB:     db,
-		JWTKey: []byte(cfg.JWT.Secret),
-	}
-
-	newValidator := validator.New()
-	authHandler := &handler.AuthHandler{
-		AuthService: authService,
-		Validator:   newValidator,
-	}
-
-	routes.RegisterAuthRoutes(router, authHandler)
-
-	err := router.Run(cfg.ServerAddress)
-	if err != nil {
-		return
+	if err := app.Run(cfg.ServerAddress); err != nil {
+		log.Fatalf("failed to run server: %v", err)
 	}
 }

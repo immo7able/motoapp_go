@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои мотоциклы</title>
+    <link rel="stylesheet" href="/css/motorcycle-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<h1>Мои объявления</h1>
+{{ if .motorcycles }}
+<ul>
+    {{ range .motorcycles }}
+    <li>
+        <strong>{{ .Brand }} {{ .MotoModel }}</strong> – {{ .Year }} г.<br>
+        Объём: {{ .Volume }} см³, Пробег: {{ .Mileage }} км<br>
+        Телефон: {{ .Phone }}<br>
+        {{ if .Description }}Описание: {{ .Description }}{{ end }}
+        <form action="/motorcycle/delete/{{ .ID }}" method="POST" style="display:inline;">
+            <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить это объявление?');">Удалить</button>
+        </form>
+    </li>
+    <hr>
+    {{ end }}
+</ul>
+{{ else }}
+<p>У вас пока нет объявлений.</p>
+{{ end }}
+<a href="/">На главную</a> | <a href="/motorcycle/add">Добавить</a>
+</body>
+</html>

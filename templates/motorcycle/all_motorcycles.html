@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Объявления</title>
+    <link rel="stylesheet" href="/css/motorcycle-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<h1>Все мотоциклы</h1>
+{{ if .motorcycles }}
+<ul>
+    {{ range .motorcycles }}
+    <li>
+        <strong>{{ .Brand }} {{ .MotoModel }}</strong> – {{ .Year }} г.<br>
+        Объём: {{ .Volume }} см³, Пробег: {{ .Mileage }} км<br>
+        Телефон: {{ .Phone }}<br>
+        {{ if .Description }}Описание: {{ .Description }}{{ end }}
+    </li>
+    <hr>
+    {{ end }}
+</ul>
+{{ else }}
+<p>Объявлений пока нет.</p>
+{{ end }}
+<a href="/">На главную</a>
+</body>
+</html>

@@ -3,18 +3,19 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"motorcycleApp/handler"
+	"motorcycleApp/middleware"
 )
 
-func RegisterAuthRoutes(r *gin.Engine, authHandler *handler.AuthHandler) {
+func RegisterAuthRoutes(r *gin.Engine, authHandler *handler.AuthHandler, secretKey []byte) {
 	auth := r.Group("/auth")
+	auth.Use(middleware.JWTAuthRedirectMiddleware(secretKey))
 	{
-		auth.GET("/register", authHandler.ShowRegisterPage)
-		auth.POST("/register-form", authHandler.RegisterForm)
-
-		auth.GET("/login", authHandler.ShowLoginPage)
-		auth.POST("/login-form", authHandler.LoginForm)
-
+		auth.GET("/register", authHandler.Register)
 		auth.POST("/register", authHandler.Register)
+
+		auth.GET("/login", authHandler.Login)
 		auth.POST("/login", authHandler.Login)
+
+		auth.GET("/logout", authHandler.Logout)
 	}
 }

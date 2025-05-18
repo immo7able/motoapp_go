@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить мотоцикл</title>
+    <link rel="stylesheet" href="/css/motorcycle-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<h1>Добавление мотоцикла</h1>
+
+{{ if .errors }}
+<p style="color:red">{{ .errors }}</p>
+{{ end }}
+
+<form action="/motorcycle/add" method="post">
+    <label>Марка:
+        <input type="text" name="Brand" value="{{.form.Brand}}" required>
+    </label>
+    {{with index .fieldErrors "Brand"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Модель:
+        <input type="text" name="Model" value="{{.form.MotoModel}}" required>
+    </label>
+    {{with index .fieldErrors "Model"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Год:
+        <input type="number" name="Year" value="{{.form.Year}}" required>
+    </label>
+    {{with index .fieldErrors "Year"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Объём (см³):
+        <input type="number" name="Volume" value="{{.form.Volume}}" required>
+    </label>
+    {{with index .fieldErrors "Volume"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Пробег (км):
+        <input type="number" name="Mileage" value="{{.form.Mileage}}" required>
+    </label>
+    {{with index .fieldErrors "Mileage"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Описание:
+        <textarea name="Description">{{.form.Description}}</textarea>
+    </label>
+    {{with index .fieldErrors "Description"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <button type="submit">Добавить</button>
+</form>
+<a href="/">Вернуться на главную</a>
+</body>
+</html>

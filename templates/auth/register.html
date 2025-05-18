@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/css/auth-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<div class="form-container">
+    <h1>Регистрация</h1>
+    <form method="post" action="/auth/register">
+        <label>
+            <input type="text" name="Login" placeholder="Логин" value="{{.form.Login}}">
+            {{with index .fieldErrors "Login"}}
+            <p class="error">{{.}}</p>
+            {{end}}
+        </label><br>
+
+        <label>
+            <input type="password" name="Password" placeholder="Пароль">
+            {{with index .fieldErrors "Password"}}
+            <p class="error">{{.}}</p>
+            {{end}}
+        </label><br>
+
+        <label>
+            <input type="text" name="Email" placeholder="Email" value="{{.form.Email}}">
+            {{with index .fieldErrors "Email"}}
+            <p class="error">{{.}}</p>
+            {{end}}
+        </label><br>
+
+        <label>
+            <input type="text" name="Phone" placeholder="Телефон (10 цифр)" value="{{.form.Phone}}">
+            {{with index .fieldErrors "Phone"}}
+            <p class="error">{{.}}</p>
+            {{end}}
+        </label><br>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    {{if .errors}}
+    <ul class="error-list">
+        {{range .errors}}
+        <li>{{.}}</li>
+        {{end}}
+    </ul>
+    {{end}}
+</div>
+</body>
+</html>
