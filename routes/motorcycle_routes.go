@@ -7,11 +7,9 @@ import (
 )
 
 func RegisterMotorcycleRoutes(r *gin.Engine, motorcycleHandler *handler.MotorcycleHandler, secretKey []byte) {
-	r.GET("/motorcycles", motorcycleHandler.GetAllMotorcycles)
-
-	motoGroup := r.Group("/motorcycle")
-	motoGroup.Use(middleware.JWTAuthMiddleware(secretKey))
-
+	motoGroup := r.Group("/motorcycles")
+	motoGroup.Use(middleware.JWTAuthMiddleware(secretKey)).GET("/", motorcycleHandler.GetAllMotorcycles)
+	motoGroup.Use(middleware.JWTAuthSecuredMiddleware(secretKey))
 	{
 		motoGroup.GET("/add", motorcycleHandler.AddMotorcycle)
 		motoGroup.POST("/add", motorcycleHandler.AddMotorcycle)

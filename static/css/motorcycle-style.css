@@ -1,7 +1,42 @@
+header {
+    background-color: #f8f9fa;
+    padding: 16px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    width: 90%;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    font-family: Arial, sans-serif;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #e2e6ea;
+    color: #000;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin-top: 12px;
+}
+
 body {
     font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 40px auto;
     padding: 20px;
     background-color: #f9f9f9;
 }

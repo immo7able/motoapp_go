@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Вход</title>
     <link rel="stylesheet" href="/css/auth-style.css">
 </head>
 <body>
 {{ template "header" . }}
-<h2>Login</h2>
-<form action="/auth/login" method="POST">
-    <label>Email:
-        <input type="text" name="Email" value="{{.form.Email}}">
-        <span style="color:red">{{index .fieldErrors "Email"}}</span>
-    </label><br>
-    <label>Password:
-        <input type="password" name="Password">
-        <span style="color:red">{{index .fieldErrors "Password"}}</span>
-    </label><br>
-    <div style="color:red">{{.error}}</div>
-    <button type="submit">Login</button>
-</form>
+<div class="center-wrapper">
+    <div class="form-container">
+        <h1>Вход</h1>
+        <form method="post" action="/auth/login">
+            <label>
+                <input type="text" name="Email" placeholder="Email" value="{{.form.Email}}">
+                {{with index .fieldErrors "Email"}}
+                <p class="error">{{.}}</p>
+                {{end}}
+            </label><br>
+
+            <label>
+                <input type="password" name="Password" placeholder="Пароль">
+                {{with index .fieldErrors "Password"}}
+                <p class="error">{{.}}</p>
+                {{end}}
+            </label><br>
+
+            <button type="submit">Войти</button>
+        </form>
+
+        {{if .error}}
+        <div class="error">{{.error}}</div>
+        {{end}}
+    </div>
+</div>
 </body>
 </html>

@@ -13,7 +13,7 @@
 <p style="color:red">{{ .errors }}</p>
 {{ end }}
 
-<form action="/motorcycle/add" method="post">
+<form action="/motorcycles/add" method="post" enctype="multipart/form-data">
     <label>Марка:
         <input type="text" name="Brand" value="{{.form.Brand}}" required>
     </label>
@@ -44,8 +44,12 @@
     </label>
     {{with index .fieldErrors "Description"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+    <label>Изображения (до 10 файлов):
+        <input type="file" name="Images" accept="image/*" multiple>
+    </label>
+    {{with index .fieldErrors "Images"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
     <button type="submit">Добавить</button>
 </form>
-<a href="/">Вернуться на главную</a>
 </body>
 </html>

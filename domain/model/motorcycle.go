@@ -1,6 +1,8 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type MotorcycleAdd struct {
 	gorm.Model
@@ -12,5 +14,13 @@ type MotorcycleAdd struct {
 	Description string `json:"description"`
 	Phone       string `json:"phone" gorm:"not null"`
 	AuthorID    uint
-	Author      User `gorm:"foreignKey:AuthorID"`
+	Author      User              `gorm:"foreignKey:AuthorID"`
+	Images      []MotorcycleImage `gorm:"foreignKey:MotorcycleID"`
+}
+
+type MotorcycleImage struct {
+	gorm.Model
+	MotorcycleID uint
+	Motorcycle   MotorcycleAdd `gorm:"foreignKey:MotorcycleID"`
+	ImagePath    string
 }

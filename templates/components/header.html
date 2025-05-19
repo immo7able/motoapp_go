@@ -1,16 +1,15 @@
 {{ define "header" }}
 <header>
     <nav>
-        <a href="/">Главная</a> |
+        <a href="/">Главная</a>
         {{ if .isAuthenticated }}
-        <a href="/motorcycle/my">Мои объявления</a> |
-        <a href="/motorcycle/add">Создать</a> |
+        <a href="/motorcycles/my">Мои объявления</a>
+        <a href="/motorcycles/add">Создать</a>
         <a href="/auth/logout">Выйти</a>
         {{ else }}
-        <a href="/auth/login">Войти</a> |
+        <a href="/auth/login">Войти</a>
         <a href="/auth/register">Регистрация</a>
         {{ end }}
     </nav>
-    <hr>
 </header>
 {{ end }}

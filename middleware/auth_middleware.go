@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
+func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var tokenStr string
 
@@ -62,7 +62,7 @@ func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
 	}
 }
 
-func JWTAuthRedirectMiddleware(secretKey []byte) gin.HandlerFunc {
+func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie("token")
 		if err != nil {
@@ -82,8 +82,7 @@ func JWTAuthRedirectMiddleware(secretKey []byte) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("isAuthenticated", false)
-		c.Redirect(http.StatusFound, "/")
-		c.Abort()
+		c.Set("isAuthenticated", true)
+		c.Next()
 	}
 }

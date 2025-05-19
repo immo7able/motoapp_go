@@ -1,12 +1,18 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+	"io"
+	"mime/multipart"
 	"motorcycleApp/domain/dto"
 	"motorcycleApp/service"
 	"motorcycleApp/utils"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 type MotorcycleHandler struct {
@@ -21,38 +27,6 @@ func (h *MotorcycleHandler) ShowCreatePage(c *gin.Context) {
 }
 
 func (h *MotorcycleHandler) AddMotorcycle(c *gin.Context) {
-	if c.Request.Header.Get("Content-Type") == "application/json" {
-		var req dto.MotorcycleAddRequest
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, dto.Error{
-				Code:    http.StatusBadRequest,
-				Message: "Invalid request",
-			})
-			return
-		}
-
-		if err := h.Validator.Struct(req); err != nil {
-			c.JSON(http.StatusBadRequest, utils.ParseValidationErrors(err))
-			return
-		}
-
-		userIDRaw, exists := c.Get("user_id")
-		if !exists {
-			c.JSON(http.StatusUnauthorized, dto.Error{Code: http.StatusUnauthorized, Message: "Unauthorized"})
-			return
-		}
-		phoneRaw, _ := c.Get("phone")
-
-		err := h.Service.AddMotorcycle(req, userIDRaw.(uint), phoneRaw.(string))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, dto.Error{Code: http.StatusInternalServerError, Message: "Failed to add motorcycle"})
-			return
-		}
-
-		c.JSON(http.StatusCreated, gin.H{"message": "Motorcycle added"})
-		return
-	}
-
 	var req dto.MotorcycleAddRequest
 	fieldErrors := map[string]string{}
 	var globalErrors []string
@@ -73,16 +47,83 @@ func (h *MotorcycleHandler) AddMotorcycle(c *gin.Context) {
 			}
 			phoneRaw, _ := c.Get("phone")
 
-			if err := h.Service.AddMotorcycle(req, userIDRaw.(uint), phoneRaw.(string)); err != nil {
+			form, err := c.MultipartForm()
+			if err != nil {
+				globalErrors = append(globalErrors, "Не удалось прочитать файлы")
+				renderMotorcycleForm(c, req, fieldErrors, globalErrors)
+				return
+			}
+			files := form.File["Images"]
+			if len(files) > 10 {
+				fieldErrors["Images"] = "Максимум 10 изображений"
+				renderMotorcycleForm(c, req, fieldErrors, globalErrors)
+				return
+			}
+
+			var imagePaths []string
+			for _, file := range files {
+				path, err := saveUploadedFile(file)
+				if err != nil {
+					globalErrors = append(globalErrors, fmt.Sprintf("Ошибка при сохранении файла: %s", file.Filename))
+					renderMotorcycleForm(c, req, fieldErrors, globalErrors)
+					return
+				}
+				imagePaths = append(imagePaths, path)
+			}
+
+			err = h.Service.AddMotorcycle(req, userIDRaw.(uint), phoneRaw.(string), imagePaths)
+			if err != nil {
 				globalErrors = append(globalErrors, "Не удалось добавить мотоцикл")
 			} else {
-				c.Redirect(http.StatusSeeOther, "/motorcycle/my")
+				c.Redirect(http.StatusSeeOther, "/motorcycles/my")
 				return
 			}
 		}
 	}
 
 	renderMotorcycleForm(c, req, fieldErrors, globalErrors)
+}
+
+func saveUploadedFile(file *multipart.FileHeader) (string, error) {
+	ext := filepath.Ext(file.Filename)
+	filename := fmt.Sprintf("%s%s", uuid.New().String(), ext)
+
+	savePath := filepath.Join("uploads/", filename)
+	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
+		return "", err
+	}
+
+	if err := saveFile(file, savePath); err != nil {
+		return "", err
+	}
+	return savePath, nil
+}
+
+func saveFile(file *multipart.FileHeader, path string) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer func(src multipart.File) {
+		err := src.Close()
+		if err != nil {
+
+		}
+	}(src)
+
+	out, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer func(out *os.File) {
+		err := out.Close()
+		if err != nil {
+
+		}
+	}(out)
+
+	_, err = io.Copy(out, src)
+	return err
 }
 
 func (h *MotorcycleHandler) GetAllMotorcycles(c *gin.Context) {
@@ -135,7 +176,7 @@ func (h *MotorcycleHandler) DeleteMotorcycle(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/motorcycle/my")
+	c.Redirect(http.StatusSeeOther, "/motorcycles/my")
 }
 
 func renderMotorcycleForm(c *gin.Context, data dto.MotorcycleAddRequest, fieldErrors map[string]string, globalErrors []string) {

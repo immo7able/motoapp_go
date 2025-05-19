@@ -16,7 +16,7 @@
         Объём: {{ .Volume }} см³, Пробег: {{ .Mileage }} км<br>
         Телефон: {{ .Phone }}<br>
         {{ if .Description }}Описание: {{ .Description }}{{ end }}
-        <form action="/motorcycle/delete/{{ .ID }}" method="POST" style="display:inline;">
+        <form action="/motorcycles/delete/{{ .ID }}" method="POST" style="display:inline;">
             <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить это объявление?');">Удалить</button>
         </form>
     </li>
@@ -26,6 +26,5 @@
 {{ else }}
 <p>У вас пока нет объявлений.</p>
 {{ end }}
-<a href="/">На главную</a> | <a href="/motorcycle/add">Добавить</a>
 </body>
 </html>

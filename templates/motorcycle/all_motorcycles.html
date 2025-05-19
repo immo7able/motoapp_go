@@ -16,6 +16,9 @@
         Объём: {{ .Volume }} см³, Пробег: {{ .Mileage }} км<br>
         Телефон: {{ .Phone }}<br>
         {{ if .Description }}Описание: {{ .Description }}{{ end }}
+        {{ if .Images }}
+        <img src="/{{ (index .Images 0).ImagePath }}" alt="Фото мотоцикла" style="max-width:200px;"><br>
+        {{ end }}
     </li>
     <hr>
     {{ end }}
@@ -23,6 +26,5 @@
 {{ else }}
 <p>Объявлений пока нет.</p>
 {{ end }}
-<a href="/">На главную</a>
 </body>
 </html>

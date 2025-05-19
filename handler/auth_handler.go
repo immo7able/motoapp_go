@@ -16,6 +16,9 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
+	if c.GetBool("isAuthenticated") {
+		c.Redirect(http.StatusSeeOther, "/")
+	}
 	if c.Request.Header.Get("Content-Type") == "application/json" {
 		var req dto.RegisterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -67,6 +70,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
+	if c.GetBool("isAuthenticated") {
+		c.Redirect(http.StatusSeeOther, "/")
+	}
 	if c.Request.Header.Get("Content-Type") == "application/json" {
 		var req dto.LoginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

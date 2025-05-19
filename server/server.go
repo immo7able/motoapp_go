@@ -13,6 +13,7 @@ func SetupApp() *gin.Engine {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*/*.html")
 	router.Static("/css", "./static/css")
+	router.Static("/uploads", "./uploads")
 
 	cfg := config.NewConfig()
 	config.ConnectDatabase(cfg.DatabaseUrl)
