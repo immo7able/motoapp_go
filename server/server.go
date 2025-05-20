@@ -39,8 +39,18 @@ func SetupApp() *gin.Engine {
 		Validator: validator.New(),
 	}
 
+	adminService := &service.AdminService{
+		DB: db,
+	}
+
+	adminHandler := &handler.AdminHandler{
+		Service:   adminService,
+		Validator: validator.New(),
+	}
+
 	routes.RegisterAuthRoutes(router, authHandler, []byte(cfg.JWT.Secret))
 	routes.RegisterMotorcycleRoutes(router, motorcycleHandler, []byte(cfg.JWT.Secret))
+	routes.RegisterAdminRoutes(router, adminHandler)
 
 	return router
 }

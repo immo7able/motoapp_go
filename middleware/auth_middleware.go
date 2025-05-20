@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"motorcycleApp/domain/model"
 	"motorcycleApp/utils"
 	"net/http"
 	"strings"
@@ -83,6 +84,24 @@ func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
 		}
 
 		c.Set("isAuthenticated", true)
+		c.Next()
+	}
+}
+
+func AdminOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		roleRaw, exists := c.Get("role")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			return
+		}
+
+		role, ok := roleRaw.(model.Role)
+		if !ok || role != model.RoleAdmin {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			return
+		}
+
 		c.Next()
 	}
 }

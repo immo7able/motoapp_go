@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить модель</title>
+    <link rel="stylesheet" href="/css/motorcycle-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<h1>Добавление модели</h1>
+
+{{ if .errors }}
+<p style="color:red">{{ .errors }}</p>
+{{ end }}
+
+<form action="/admin/models/add" method="post">
+    <label>Название модели:
+        <input type="text" name="Name" value="{{.form.Name}}" required>
+    </label>
+    {{with index .fieldErrors "Name"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <label>Бренд:
+        <select name="BrandID" required>
+            <option value="">Выберите бренд</option>
+            {{range .brands}}
+            <option value="{{.ID}}" {{if eq .ID $.form.BrandID}}selected{{end}}>{{.Name}}</option>
+            {{end}}
+        </select>
+    </label>
+    {{with index .fieldErrors "BrandID"}}<p style="color:red">{{.}}</p>{{end}}
+    <br>
+    <button type="submit">Добавить</button>
+</form>
+</body>
+</html>

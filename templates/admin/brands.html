@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Добавить бренд</title>
+  <link rel="stylesheet" href="/css/motorcycle-style.css">
+</head>
+<body>
+{{ template "header" . }}
+<h1>Добавление бренда</h1>
+
+{{ if .errors }}
+<p style="color:red">{{ .errors }}</p>
+{{ end }}
+
+<form action="/admin/brands/add" method="post">
+  <label>Название бренда:
+    <input type="text" name="Name" value="{{.form.Name}}" required>
+  </label>
+  {{with index .fieldErrors "Name"}}<p style="color:red">{{.}}</p>{{end}}
+  <br>
+  <button type="submit">Добавить</button>
+</form>
+</body>
+</html>

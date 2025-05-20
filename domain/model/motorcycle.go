@@ -24,3 +24,15 @@ type MotorcycleImage struct {
 	Motorcycle   MotorcycleAdd `gorm:"foreignKey:MotorcycleID"`
 	ImagePath    string
 }
+
+type MotorcycleBrand struct {
+	gorm.Model
+	Brand string `json:"brand" gorm:"not null"`
+}
+
+type MotorcycleModel struct {
+	gorm.Model
+	MotorcycleBrandID uint
+	Brand             MotorcycleBrand `gorm:"foreignKey:MotorcycleBrandID"`
+	MotoModel         string          `json:"model" gorm:"not null"`
+}

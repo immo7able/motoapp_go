@@ -88,7 +88,7 @@ func saveUploadedFile(file *multipart.FileHeader) (string, error) {
 	ext := filepath.Ext(file.Filename)
 	filename := fmt.Sprintf("%s%s", uuid.New().String(), ext)
 
-	savePath := filepath.Join("uploads/", filename)
+	savePath := filepath.Join("uploads", filename)
 	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
 		return "", err
 	}
@@ -96,7 +96,8 @@ func saveUploadedFile(file *multipart.FileHeader) (string, error) {
 	if err := saveFile(file, savePath); err != nil {
 		return "", err
 	}
-	return savePath, nil
+	webPath := filepath.ToSlash(savePath)
+	return webPath, nil
 }
 
 func saveFile(file *multipart.FileHeader, path string) error {
