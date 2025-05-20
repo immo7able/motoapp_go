@@ -21,8 +21,9 @@ type MotorcycleHandler struct {
 }
 
 func (h *MotorcycleHandler) ShowCreatePage(c *gin.Context) {
+	roleValue, _ := c.Get("role")
 	c.HTML(http.StatusOK, "add_motorcycle.html", gin.H{
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"role": roleValue,
 	})
 }
 
@@ -129,21 +130,24 @@ func saveFile(file *multipart.FileHeader, path string) error {
 
 func (h *MotorcycleHandler) GetAllMotorcycles(c *gin.Context) {
 	motos, err := h.Service.GetAllMotorcycles()
+	roleValue, _ := c.Get("role")
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "all_motorcycles.html", gin.H{
-			"error":           "Failed to load motorcycles",
-			"isAuthenticated": c.GetBool("isAuthenticated"),
+			"error": "Failed to load motorcycles",
+			"role":  roleValue,
 		})
 		return
 	}
+
 	c.HTML(http.StatusOK, "all_motorcycles.html", gin.H{
-		"motorcycles":     motos,
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"motorcycles": motos,
+		"role":        roleValue,
 	})
 }
 
 func (h *MotorcycleHandler) GetUserMotorcycles(c *gin.Context) {
 	userIDRaw, exists := c.Get("user_id")
+	roleValue, _ := c.Get("role")
 	if !exists {
 		c.Redirect(http.StatusSeeOther, "/login")
 		return
@@ -153,14 +157,14 @@ func (h *MotorcycleHandler) GetUserMotorcycles(c *gin.Context) {
 	motos, err := h.Service.GetUserMotorcycles(userID)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "my_motorcycles.html", gin.H{
-			"error":           "Failed to load your motorcycles",
-			"isAuthenticated": c.GetBool("isAuthenticated"),
+			"error": "Failed to load your motorcycles",
+			"role":  roleValue,
 		})
 		return
 	}
 	c.HTML(http.StatusOK, "my_motorcycles.html", gin.H{
-		"motorcycles":     motos,
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"motorcycles": motos,
+		"role":        roleValue,
 	})
 }
 
@@ -181,10 +185,11 @@ func (h *MotorcycleHandler) DeleteMotorcycle(c *gin.Context) {
 }
 
 func renderMotorcycleForm(c *gin.Context, data dto.MotorcycleAddRequest, fieldErrors map[string]string, globalErrors []string) {
+	roleValue, _ := c.Get("role")
 	c.HTML(http.StatusOK, "add_motorcycle.html", gin.H{
-		"form":            data,
-		"fieldErrors":     fieldErrors,
-		"errors":          globalErrors,
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"form":        data,
+		"fieldErrors": fieldErrors,
+		"errors":      globalErrors,
+		"role":        roleValue,
 	})
 }

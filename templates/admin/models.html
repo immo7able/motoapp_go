@@ -3,33 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Добавить модель</title>
+    <link rel="stylesheet" href="/css/admin-style.css">
     <link rel="stylesheet" href="/css/motorcycle-style.css">
 </head>
 <body>
 {{ template "header" . }}
 <h1>Добавление модели</h1>
 
-{{ if .errors }}
-<p style="color:red">{{ .errors }}</p>
-{{ end }}
+<div class="brand-container">
+    <div class="brand-list">
+        <h2>Существующие модели</h2>
+        <ul>
+            {{ range .models }}
+            <li class="brand-item">{{ .MotoModel }} ({{ .Brand.Brand }})</li>
+            {{ else }}
+            <li class="brand-item empty">Моделей пока нет</li>
+            {{ end }}
+        </ul>
+    </div>
 
-<form action="/admin/models/add" method="post">
-    <label>Название модели:
-        <input type="text" name="Name" value="{{.form.Name}}" required>
-    </label>
-    {{with index .fieldErrors "Name"}}<p style="color:red">{{.}}</p>{{end}}
-    <br>
-    <label>Бренд:
-        <select name="BrandID" required>
-            <option value="">Выберите бренд</option>
-            {{range .brands}}
-            <option value="{{.ID}}" {{if eq .ID $.form.BrandID}}selected{{end}}>{{.Name}}</option>
-            {{end}}
-        </select>
-    </label>
-    {{with index .fieldErrors "BrandID"}}<p style="color:red">{{.}}</p>{{end}}
-    <br>
-    <button type="submit">Добавить</button>
-</form>
+    <div class="form-wrapper">
+        {{ if .errors }}
+        {{ range .errors }}
+        <p class="error">{{ . }}</p>
+        {{ end }}
+        {{ end }}
+
+        <form action="/admin/models" method="post">
+            <label>Название модели:
+                <input type="text" name="Name" value="{{ .form.Name }}" required>
+            </label>
+            {{ with index .fieldErrors "Name" }}
+            <p class="error">{{ . }}</p>
+            {{ end }}
+
+            <label>Бренд:
+                <select name="BrandID" required>
+                    <option value="">Выберите бренд</option>
+                    {{ range .brands }}
+                    <option value="{{ .ID }}" {{ if eq .ID $.form.BrandID }}selected{{ end }}>{{ .Brand }}</option>
+                    {{ end }}
+                </select>
+            </label>
+            {{ with index .fieldErrors "BrandID" }}
+            <p class="error">{{ . }}</p>
+            {{ end }}
+
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

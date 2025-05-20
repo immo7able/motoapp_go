@@ -1,0 +1,75 @@
+header {
+    background-color: #f8f9fa;
+    padding: 16px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    width: 90%;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    font-family: Arial, sans-serif;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #e2e6ea;
+    color: #000;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin-top: 12px;
+}
+
+.brand-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.brand-list, .form-wrapper {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.brand-list h2 {
+    margin-top: 0;
+}
+
+.brand-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.brand-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: bold;
+    color: #333;
+}
+
+.brand-item.empty {
+    color: #888;
+    font-style: italic;
+}

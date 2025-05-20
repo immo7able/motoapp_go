@@ -2,10 +2,17 @@
 <header>
     <nav>
         <a href="/">Главная</a>
-        {{ if .isAuthenticated }}
+
+        {{ if eq .role "USER" }}
         <a href="/motorcycles/my">Мои объявления</a>
         <a href="/motorcycles/add">Создать</a>
         <a href="/auth/logout">Выйти</a>
+
+        {{ else if eq .role "ADMIN" }}
+        <a href="/admin/brands">Бренды</a>
+        <a href="/admin/models">Модели</a>
+        <a href="/auth/logout">Выйти</a>
+
         {{ else }}
         <a href="/auth/login">Войти</a>
         <a href="/auth/register">Регистрация</a>

@@ -16,8 +16,11 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
-	if c.GetBool("isAuthenticated") {
-		c.Redirect(http.StatusSeeOther, "/")
+	if roleValue, exists := c.Get("role"); exists {
+		if role, ok := roleValue.(string); ok && role != "" {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
 	}
 	if c.Request.Header.Get("Content-Type") == "application/json" {
 		var req dto.RegisterRequest
@@ -70,8 +73,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	if c.GetBool("isAuthenticated") {
-		c.Redirect(http.StatusSeeOther, "/")
+	if roleValue, exists := c.Get("role"); exists {
+		if role, ok := roleValue.(string); ok && role != "" {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
 	}
 	if c.Request.Header.Get("Content-Type") == "application/json" {
 		var req dto.LoginRequest
@@ -119,19 +125,19 @@ func (h *AuthHandler) Login(c *gin.Context) {
 			return
 		}
 	}
-
+	roleValue, _ := c.Get("role")
 	c.HTML(http.StatusOK, "login.html", gin.H{
-		"form":            req,
-		"fieldErrors":     fieldErrors,
-		"error":           globalError,
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"form":        req,
+		"fieldErrors": fieldErrors,
+		"error":       globalError,
+		"role":        roleValue,
 	})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 
-	c.Set("isAuthenticated", false)
+	c.Set("role", nil)
 	c.Set("user_id", nil)
 	c.Set("role", nil)
 	c.Set("phone", nil)
@@ -140,10 +146,11 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 func renderRegisterForm(c *gin.Context, data dto.RegisterRequest, fieldErrors map[string]string, globalErrors []string) {
+	roleValue, _ := c.Get("role")
 	c.HTML(http.StatusOK, "register.html", gin.H{
-		"form":            data,
-		"fieldErrors":     fieldErrors,
-		"errors":          globalErrors,
-		"isAuthenticated": c.GetBool("isAuthenticated"),
+		"form":        data,
+		"fieldErrors": fieldErrors,
+		"errors":      globalErrors,
+		"role":        roleValue,
 	})
 }

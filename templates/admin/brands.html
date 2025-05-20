@@ -1,25 +1,42 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Добавить бренд</title>
-  <link rel="stylesheet" href="/css/motorcycle-style.css">
+    <meta charset="UTF-8">
+    <title>Добавить бренд</title>
+    <link rel="stylesheet" href="/css/admin-style.css">
+    <link rel="stylesheet" href="/css/motorcycle-style.css">
 </head>
 <body>
 {{ template "header" . }}
 <h1>Добавление бренда</h1>
 
-{{ if .errors }}
-<p style="color:red">{{ .errors }}</p>
-{{ end }}
+<div class="brand-container">
+    <div class="brand-list">
+        <h2>Существующие бренды</h2>
+        <ul>
+            {{ range .brands }}
+            <li class="brand-item">{{ .Brand }}</li>
+            {{ else }}
+            <li class="brand-item empty">Брендов пока нет</li>
+            {{ end }}
+        </ul>
+    </div>
 
-<form action="/admin/brands/add" method="post">
-  <label>Название бренда:
-    <input type="text" name="Name" value="{{.form.Name}}" required>
-  </label>
-  {{with index .fieldErrors "Name"}}<p style="color:red">{{.}}</p>{{end}}
-  <br>
-  <button type="submit">Добавить</button>
-</form>
+    <div class="form-wrapper">
+        {{ if .errors }}
+        <p class="error">{{ .errors }}</p>
+        {{ end }}
+
+        <form action="/admin/brands" method="post">
+            <label>Название бренда:
+                <input type="text" name="Name" value="{{ .form.Name }}" required>
+            </label>
+            {{ with index .fieldErrors "Name" }}
+            <p class="error">{{ . }}</p>
+            {{ end }}
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

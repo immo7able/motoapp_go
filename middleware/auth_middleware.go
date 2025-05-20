@@ -24,7 +24,7 @@ func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 		}
 
 		if tokenStr == "" {
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -34,7 +34,7 @@ func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 		})
 		if err != nil || !token.Valid {
 			c.SetCookie("token", "", -1, "/", "", false, true)
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -42,7 +42,7 @@ func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
 			c.SetCookie("token", "", -1, "/", "", false, true)
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -50,7 +50,7 @@ func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 		userID, role, phone, ok := utils.ExtractUserClaims(claims)
 		if !ok {
 			c.SetCookie("token", "", -1, "/", "", false, true)
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -58,7 +58,6 @@ func JWTAuthSecuredMiddleware(secretKey []byte) gin.HandlerFunc {
 		c.Set("user_id", userID)
 		c.Set("role", role)
 		c.Set("phone", phone)
-		c.Set("isAuthenticated", true)
 		c.Next()
 	}
 }
@@ -67,7 +66,7 @@ func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie("token")
 		if err != nil {
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.Next()
 			return
 		}
@@ -78,30 +77,92 @@ func JWTAuthMiddleware(secretKey []byte) gin.HandlerFunc {
 
 		if err != nil || !token.Valid {
 			c.SetCookie("token", "", -1, "/", "", false, true)
-			c.Set("isAuthenticated", false)
+			c.Set("role", nil)
 			c.Next()
 			return
 		}
 
-		c.Set("isAuthenticated", true)
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.SetCookie("token", "", -1, "/", "", false, true)
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID, roleStr, phone, ok := utils.ExtractUserClaims(claims)
+		if !ok {
+			c.SetCookie("token", "", -1, "/", "", false, true)
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		role := model.Role(roleStr)
+
+		c.Set("user_id", userID)
+		c.Set("role", role)
+		c.Set("phone", phone)
 		c.Next()
 	}
 }
 
-func AdminOnly() gin.HandlerFunc {
+func AdminOnly(secretKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		roleRaw, exists := c.Get("role")
-		if !exists {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		var tokenStr string
+
+		authHeader := c.GetHeader("Authorization")
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			tokenStr = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			cookie, err := c.Cookie("token")
+			if err == nil {
+				tokenStr = cookie
+			}
+		}
+
+		if tokenStr == "" {
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		role, ok := roleRaw.(model.Role)
-		if !ok || role != model.RoleAdmin {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+		if err != nil || !token.Valid {
+			c.SetCookie("token", "", -1, "/", "", false, true)
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.SetCookie("token", "", -1, "/", "", false, true)
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID, roleStr, phone, ok := utils.ExtractUserClaims(claims)
+		if !ok {
+			c.SetCookie("token", "", -1, "/", "", false, true)
+			c.Set("role", nil)
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		role := model.Role(roleStr)
+
+		if role != model.RoleAdmin {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+
+		c.Set("user_id", userID)
+		c.Set("role", role)
+		c.Set("phone", phone)
 		c.Next()
 	}
 }

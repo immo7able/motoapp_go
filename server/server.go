@@ -50,7 +50,7 @@ func SetupApp() *gin.Engine {
 
 	routes.RegisterAuthRoutes(router, authHandler, []byte(cfg.JWT.Secret))
 	routes.RegisterMotorcycleRoutes(router, motorcycleHandler, []byte(cfg.JWT.Secret))
-	routes.RegisterAdminRoutes(router, adminHandler)
+	routes.RegisterAdminRoutes(router, adminHandler, []byte(cfg.JWT.Secret))
 
 	return router
 }

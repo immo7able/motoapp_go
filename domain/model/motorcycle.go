@@ -27,12 +27,12 @@ type MotorcycleImage struct {
 
 type MotorcycleBrand struct {
 	gorm.Model
-	Brand string `json:"brand" gorm:"not null"`
+	Brand string `json:"brand" gorm:"not null;unique"`
 }
 
 type MotorcycleModel struct {
 	gorm.Model
 	MotorcycleBrandID uint
 	Brand             MotorcycleBrand `gorm:"foreignKey:MotorcycleBrandID"`
-	MotoModel         string          `json:"model" gorm:"not null"`
+	MotoModel         string          `json:"model" gorm:"not null;unique"`
 }
