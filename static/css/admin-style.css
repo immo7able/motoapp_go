@@ -62,14 +62,25 @@ hr {
     margin: 0;
 }
 
-.brand-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
-    font-weight: bold;
-    color: #333;
-}
-
 .brand-item.empty {
     color: #888;
     font-style: italic;
+}
+
+.brand-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+}
+
+.brand-name {
+    font-weight: 500;
+}
+
+.brand-actions {
+    display: flex;
+    gap: 8px;
 }

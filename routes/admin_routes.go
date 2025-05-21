@@ -14,5 +14,11 @@ func RegisterAdminRoutes(r *gin.Engine, adminHandler *handler.AdminHandler, secr
 
 		admin.GET("/models", adminHandler.CreateModel)
 		admin.POST("/models", adminHandler.CreateModel)
+
+		admin.POST("/brands/update/:id", adminHandler.UpdateBrand)
+		admin.POST("/brands/delete/:id", adminHandler.DeleteBrand)
+
+		admin.POST("/models/update/:id", adminHandler.UpdateModel)
+		admin.POST("/models/delete/:id", adminHandler.DeleteModel)
 	}
 }

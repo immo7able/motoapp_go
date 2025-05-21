@@ -14,10 +14,20 @@ func SetupApp() *gin.Engine {
 	router.LoadHTMLGlob("templates/*/*.html")
 	router.Static("/css", "./static/css")
 	router.Static("/uploads", "./uploads")
+	router.Static("/js", "./static/js")
 
 	cfg := config.NewConfig()
 	config.ConnectDatabase(cfg.DatabaseUrl)
 	db := config.DB
+
+	adminService := &service.AdminService{
+		DB: db,
+	}
+
+	adminHandler := &handler.AdminHandler{
+		Service:   adminService,
+		Validator: validator.New(),
+	}
 
 	authService := &service.AuthService{
 		DB:     db,
@@ -35,17 +45,9 @@ func SetupApp() *gin.Engine {
 	}
 
 	motorcycleHandler := &handler.MotorcycleHandler{
-		Service:   motorcycleService,
-		Validator: validator.New(),
-	}
-
-	adminService := &service.AdminService{
-		DB: db,
-	}
-
-	adminHandler := &handler.AdminHandler{
-		Service:   adminService,
-		Validator: validator.New(),
+		Service:      motorcycleService,
+		Validator:    validator.New(),
+		AdminService: adminService,
 	}
 
 	routes.RegisterAuthRoutes(router, authHandler, []byte(cfg.JWT.Secret))

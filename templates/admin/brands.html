@@ -15,7 +15,19 @@
         <h2>Существующие бренды</h2>
         <ul>
             {{ range .brands }}
-            <li class="brand-item">{{ .Brand }}</li>
+            <li class="brand-item">
+                <form action="/admin/brands/update/{{ .ID }}" method="post" class="brand-inline-form">
+                    <input type="text" name="Name" value="{{ .Brand }}" required>
+                    {{ with index $.fieldErrors "Name" }}
+                    <p class="error">{{ . }}</p>
+                    {{ end }}
+                    <button type="submit" class="btn-edit">Редактировать</button>
+                </form>
+
+                <form action="/admin/brands/delete/{{ .ID }}" method="post" onsubmit="return confirm('Удалить бренд {{ .Brand }}?');" class="brand-inline-form">
+                    <button type="submit" class="btn-delete">Удалить</button>
+                </form>
+            </li>
             {{ else }}
             <li class="brand-item empty">Брендов пока нет</li>
             {{ end }}

@@ -9,18 +9,38 @@
 {{ template "header" . }}
 <h1>Мои объявления</h1>
 {{ if .motorcycles }}
-<ul>
+<ul class="motorcycle-list">
     {{ range .motorcycles }}
-    <li>
-        <strong>{{ .Brand }} {{ .MotoModel }}</strong> – {{ .Year }} г.<br>
-        Объём: {{ .Volume }} см³, Пробег: {{ .Mileage }} км<br>
-        Телефон: {{ .Phone }}<br>
-        {{ if .Description }}Описание: {{ .Description }}{{ end }}
-        <form action="/motorcycles/delete/{{ .ID }}" method="POST" style="display:inline;">
-            <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить это объявление?');">Удалить</button>
-        </form>
+    <li class="motorcycle-card">
+        <div class="motorcycle-image">
+            <img src="/{{ (index .Images 0).ImagePath }}" alt="Фото мотоцикла">
+        </div>
+        <div class="motorcycle-details">
+            <div class="title">
+                <a href="/motorcycles/{{ .ID }}"><strong>{{ .Brand.Brand }} {{ .MotoModel.MotoModel }}</strong> – {{ .Year }} г.</a>
+            </div>
+            <div class="specs">
+                Объём: {{ .Volume }} см³<br>
+                Пробег: {{ .Mileage }} км<br>
+                Телефон: {{ .Phone }}
+            </div>
+            {{ if .Description }}
+            <div class="description">
+                <strong>Описание:</strong> {{ .Description }}
+            </div>
+            {{ end }}
+            {{ if .ID }}
+            <div class="actions-container">
+                <form action="/motorcycles/delete/{{ .ID }}" method="POST" class="actions">
+                    <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить это объявление?');" class="btn btn-delete">Удалить</button>
+                </form>
+                <form action="/motorcycles/edit/{{ .ID }}" method="GET" class="actions">
+                    <button type="submit" class="btn btn-edit">Редактировать</button>
+                </form>
+            </div>
+            {{ end }}
+        </div>
     </li>
-    <hr>
     {{ end }}
 </ul>
 {{ else }}

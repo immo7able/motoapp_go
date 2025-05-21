@@ -2,69 +2,75 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Добавить мотоцикл</title>
+    <title>Редактировать мотоцикл</title>
     <link rel="stylesheet" href="/css/motorcycle-style.css">
     <script>
         window.modelData = {
             allModels: {{ .models }},
-        selectedModelID: null
+            selectedModelID: {{ .form.ModelID }}
         };
     </script>
+
     <script src="/js/model_by_brand.js" defer></script>
 
 </head>
 <body>
 {{ template "header" . }}
-<h1>Добавление мотоцикла</h1>
+<h1>Редактирование мотоцикла</h1>
 
 {{ if .errors }}
 <p style="color:red">{{ .errors }}</p>
 {{ end }}
 
-<form action="/motorcycles/add" method="post" enctype="multipart/form-data">
+<form action="/motorcycles/edit/{{.form.ID}}" method="post" enctype="multipart/form-data">
     <label>Марка:
-        <select id="brandSelect" name="BrandID" required>
+        <select name="BrandID" id="brandSelect" required>
             <option value="">-- Выберите марку --</option>
-            {{range .brands}}
-            <option value="{{.ID}}">{{.Brand}}</option>
-            {{end}}
+            {{ range .brands }}
+            <option value="{{ .ID }}" {{if eq .ID $.form.BrandID}}selected{{end}}>{{ .Brand }}</option>
+            {{ end }}
         </select>
     </label>
     {{with index .fieldErrors "BrandID"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+
     <label>Модель:
-        <select id="modelSelect" name="ModelID" required>
-            <option value="">-- Выберите модель --</option>
+        <select name="ModelID" id="modelSelect" required>
         </select>
     </label>
     {{with index .fieldErrors "ModelID"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+
     <label>Год:
         <input type="number" name="Year" value="{{.form.Year}}" required>
     </label>
     {{with index .fieldErrors "Year"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+
     <label>Объём (см³):
         <input type="number" name="Volume" value="{{.form.Volume}}" required>
     </label>
     {{with index .fieldErrors "Volume"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+
     <label>Пробег (км):
         <input type="number" name="Mileage" value="{{.form.Mileage}}" required>
     </label>
     {{with index .fieldErrors "Mileage"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
+
     <label>Описание:
         <textarea name="Description">{{.form.Description}}</textarea>
     </label>
     {{with index .fieldErrors "Description"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
-    <label>Изображения (до 10 файлов):
+
+    <label>Изображения (если хотите заменить, выберите до 10 новых):
         <input type="file" name="Images" accept="image/*" multiple>
     </label>
     {{with index .fieldErrors "Images"}}<p style="color:red">{{.}}</p>{{end}}
     <br>
-    <button type="submit">Добавить</button>
+    <button type="submit">Сохранить изменения</button>
 </form>
 </body>
 </html>

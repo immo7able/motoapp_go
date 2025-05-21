@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ .Ad.MotoModel.MotoModel }} - {{ .Ad.Brand.Brand }}</title>
+  <link rel="stylesheet" href="/css/ad-style.css">
+  <script>
+    function openFullscreen(src) {
+      const modal = document.getElementById('img-modal');
+      const modalImg = document.getElementById('modal-img');
+      modal.style.display = 'flex';
+      modalImg.src = src;
+    }
+
+    function closeModal() {
+      document.getElementById('img-modal').style.display = 'none';
+    }
+  </script>
+</head>
+<body>
+{{ template "header" . }}
+<div class="ad-container">
+  <h1>{{ .Ad.Brand.Brand }} {{ .Ad.MotoModel.MotoModel }}</h1>
+
+  <div class="ad-main">
+    <div class="ad-info-block">
+      <div class="ad-info">
+        <h2>Характеристики</h2>
+        <p><strong>Бренд:</strong> {{ .Ad.Brand.Brand }}</p>
+        <p><strong>Модель:</strong> {{ .Ad.MotoModel.MotoModel }}</p>
+        <p><strong>Год выпуска:</strong> {{ .Ad.Year }}</p>
+        <p><strong>Объем двигателя:</strong> {{ .Ad.Volume }} см³</p>
+        <p><strong>Пробег:</strong> {{ .Ad.Mileage }} км</p>
+        <p><strong>Контакт:</strong> {{ .Ad.Phone }}</p>
+      </div>
+    </div>
+
+    <div class="ad-image-block">
+      {{ if gt (len .Ad.Images) 0 }}
+      <div class="main-image">
+        <img src="/{{ (index .Ad.Images 0).ImagePath }}" class="thumbnail" alt="Главное изображение" onclick="openFullscreen('/{{ (index .Ad.Images 0).ImagePath }}')">
+      </div>
+      {{ end }}
+
+      {{ if gt (len .Ad.Images) 1 }}
+      <div class="thumbnail-list">
+        {{ range $i, $img := .Ad.Images }}
+        {{ if gt $i 0 }}
+        <img src="/{{ $img.ImagePath }}" alt="Фото" class="thumbnail" onclick="openFullscreen('/{{ $img.ImagePath }}')">
+        {{ end }}
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  <div class="ad-description">
+    <h2>Описание</h2>
+    <p>{{ .Ad.Description }}</p>
+  </div>
+  <div class="comments-section">
+    <h2>Комментарии</h2>
+
+    {{ if or (eq .role "USER") (eq .role "ADMIN") }}
+    <form action="/comments/{{ .Ad.ID }}" method="POST" class="comment-form">
+      <textarea name="content" placeholder="Оставьте ваш комментарий..." required></textarea>
+      <button type="submit">Отправить</button>
+    </form>
+    {{end}}
+
+    <div class="comment-list">
+      {{ range .Comments }}
+      <div class="comment">
+        <strong>{{ .User.Login }}</strong>
+        <p>{{ .Content }}</p>
+        {{ if or (eq $.userID .User.ID) (eq $.role "ADMIN") }}
+        <form action="/comments/{{ .ID }}/delete" method="POST" style="display:inline;">
+          <button type="submit" onclick="return confirm('Удалить комментарий?')" class="btn-delete">Удалить</button>
+        </form>
+        {{ end }}
+      </div>
+      {{ else }}
+      <p>Комментариев пока нет. Будьте первым!</p>
+      {{ end }}
+    </div>
+  </div>
+
+</div>
+
+<div id="img-modal" class="modal" onclick="closeModal()">
+  <span class="close" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="modal-img">
+</div>
+
+</body>
+</html>

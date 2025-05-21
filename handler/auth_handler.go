@@ -17,7 +17,7 @@ type AuthHandler struct {
 
 func (h *AuthHandler) Register(c *gin.Context) {
 	if roleValue, exists := c.Get("role"); exists {
-		if role, ok := roleValue.(string); ok && role != "" {
+		if roleValue != nil {
 			c.Redirect(http.StatusSeeOther, "/")
 			return
 		}
@@ -74,7 +74,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 func (h *AuthHandler) Login(c *gin.Context) {
 	if roleValue, exists := c.Get("role"); exists {
-		if role, ok := roleValue.(string); ok && role != "" {
+		if roleValue != nil {
 			c.Redirect(http.StatusSeeOther, "/")
 			return
 		}

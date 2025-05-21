@@ -15,7 +15,25 @@
         <h2>Существующие модели</h2>
         <ul>
             {{ range .models }}
-            <li class="brand-item">{{ .MotoModel }} ({{ .Brand.Brand }})</li>
+            {{ $model := . }}
+            <li class="brand-item">
+                <form action="/admin/models/update/{{ .ID }}" method="post" class="brand-inline-form">
+                    <input type="text" name="Name" value="{{ .MotoModel }}" required>
+                    <select name="BrandID" required>
+                        {{ range $.brands }}
+                        <option value="{{ .ID }}" {{ if eq .ID $model.MotorcycleBrandID }}selected{{ end }}>{{ .Brand }}</option>
+                        {{ end }}
+                    </select>
+                    {{ with index $.fieldErrors "Name" }}
+                    <p class="error">{{ . }}</p>
+                    {{ end }}
+                    <button type="submit" class="btn-edit">Редактировать</button>
+                </form>
+
+                <form action="/admin/models/delete/{{ .ID }}" method="post" onsubmit="return confirm('Удалить модель {{ .MotoModel }}?');" class="brand-inline-form">
+                    <button type="submit" class="btn-delete">Удалить</button>
+                </form>
+            </li>
             {{ else }}
             <li class="brand-item empty">Моделей пока нет</li>
             {{ end }}
