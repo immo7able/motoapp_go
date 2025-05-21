@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -153,4 +154,94 @@ func renderRegisterForm(c *gin.Context, data dto.RegisterRequest, fieldErrors ma
 		"errors":      globalErrors,
 		"role":        roleValue,
 	})
+}
+
+func (h *AuthHandler) ProfilePage(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	user, err := h.AuthService.GetUserByID(userID.(uint))
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Ошибка при загрузке профиля")
+		return
+	}
+
+	c.HTML(http.StatusOK, "profile.html", gin.H{
+		"User": user,
+		"role": user.Role,
+	})
+}
+
+func (h *AuthHandler) UpdateProfile(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	var input struct {
+		Login       string `form:"login"`
+		OldPassword string `form:"old_password"`
+		NewPassword string `form:"new_password"`
+	}
+
+	var (
+		successMsg string
+		errorMsg   string
+	)
+
+	if err := c.ShouldBind(&input); err != nil {
+		errorMsg = "Неверный ввод"
+		h.renderProfileForm(c, userID.(uint), input.Login, errorMsg, successMsg)
+		return
+	}
+
+	user, err := h.AuthService.GetUserByID(userID.(uint))
+	if err != nil {
+		errorMsg = "Пользователь не найден"
+		h.renderProfileForm(c, userID.(uint), input.Login, errorMsg, successMsg)
+		return
+	}
+
+	if !CheckPassword(input.OldPassword, user.Password) {
+		errorMsg = "Неверный старый пароль"
+		h.renderProfileForm(c, userID.(uint), input.Login, errorMsg, successMsg)
+		return
+	}
+
+	user.Login = input.Login
+	if input.NewPassword != "" {
+		hashed, err := HashPassword(input.NewPassword)
+		if err != nil {
+			errorMsg = "Ошибка при хешировании пароля"
+			h.renderProfileForm(c, userID.(uint), input.Login, errorMsg, successMsg)
+			return
+		}
+		user.Password = hashed
+	}
+
+	if err := h.AuthService.UpdateUser(user); err != nil {
+		errorMsg = "Ошибка обновления данных"
+		h.renderProfileForm(c, userID.(uint), input.Login, errorMsg, successMsg)
+		return
+	}
+
+	successMsg = "Профиль успешно обновлен"
+	h.renderProfileForm(c, userID.(uint), user.Login, "", successMsg)
+}
+
+func (h *AuthHandler) renderProfileForm(c *gin.Context, userID uint, login string, errorMsg, successMsg string) {
+	user, _ := h.AuthService.GetUserByID(userID)
+	c.HTML(http.StatusOK, "profile.html", gin.H{
+		"User":       user,
+		"role":       user.Role,
+		"error":      errorMsg,
+		"success":    successMsg,
+		"loginValue": login,
+	})
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	return string(bytes), err
+}
+
+func CheckPassword(password, hashed string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+	return err == nil
 }

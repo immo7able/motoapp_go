@@ -17,4 +17,11 @@ func RegisterAuthRoutes(r *gin.Engine, authHandler *handler.AuthHandler, secretK
 		auth.GET("/login", authHandler.Login)
 		auth.POST("/login", authHandler.Login)
 	}
+
+	authGroup := r.Group("/")
+	authGroup.Use(middleware.JWTAuthSecuredMiddleware(secretKey))
+	{
+		authGroup.GET("/profile", authHandler.ProfilePage)
+		authGroup.POST("/profile/update", authHandler.UpdateProfile)
+	}
 }

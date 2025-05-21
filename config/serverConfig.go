@@ -2,8 +2,8 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
-	"log"
+	"os"
+	"strings"
 )
 
 type Config struct {
@@ -15,17 +15,17 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	cfg := &Config{}
-
-	bytes, err := ioutil.ReadFile("config/application.yaml")
+	content, err := os.ReadFile("config/application.yaml")
 	if err != nil {
-		log.Fatalf("could not read config file: %v", err)
+		panic("Failed to read config file: " + err.Error())
 	}
 
-	err = yaml.Unmarshal(bytes, cfg)
-	if err != nil {
-		log.Fatalf("could not unmarshal config: %v", err)
+	expanded := os.ExpandEnv(string(content))
+
+	var cfg Config
+	if err := yaml.NewDecoder(strings.NewReader(expanded)).Decode(&cfg); err != nil {
+		panic("Failed to decode config: " + err.Error())
 	}
 
-	return cfg
+	return &cfg
 }

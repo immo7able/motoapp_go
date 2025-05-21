@@ -47,3 +47,15 @@ func (s *AuthService) LoginUser(req dto.LoginRequest) (string, error) {
 
 	return token.SignedString(s.JWTKey)
 }
+
+func (s *AuthService) GetUserByID(id uint) (*model.User, error) {
+	var user model.User
+	if err := s.DB.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *AuthService) UpdateUser(user *model.User) error {
+	return s.DB.Save(user).Error
+}
